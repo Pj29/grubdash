@@ -71,3 +71,11 @@ function destroy(req, res, next) {
     });
   }
 }
+
+module.exports = {
+  list,
+  create,
+  read,
+  update,
+  destroy,
+};
