@@ -50,9 +50,49 @@ function orderExists(req, res, next) {
 function update(req, res, next) {
   const { orderId } = req.params;
   const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
+
+  if (
+    !deliverTo ||
+    !mobileNumber ||
+    !status ||
+    !dishes ||
+    !Array.isArray(dishes) ||
+    dishes.length === 0
+  ) {
+    return next({
+      status: 400,
+      message: "Invalid data",
+    });
+  }
+
+  const updatedOrder = {
+    id: orderId,
+    deliverTo,
+    mobileNumber,
+    status,
+    dishes,
+  };
+
+  const index = orders.findIndex((order) => order.id === orderId);
+  orders[index] = updatedOrder;
+
+  res.json({ data: updatedOrder });
 }
 
-function destroy(req, res, next) {}
+function destroy(req, res, next) {
+  const { orderId } = req.params;
+  const index = orders.findIndex((order) => order.id === orderId);
+
+  if (index > -1) {
+    orders.splice(index, 1);
+    res.sendStatus(204);
+  } else {
+    next({
+      status: 404,
+      message: `Order ID not found: ${orderId}`,
+    });
+  }
+}
 
 module.exports = {
   list,
