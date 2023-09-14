@@ -27,12 +27,30 @@ function read(req, res, next) {
   } else {
     next({
       status: 404,
-      message: `Order id not foudn: ${orderId}`,
+      message: `Order id not found: ${orderId}`,
     });
   }
 }
 
-function update(req, res, next) {}
+function orderExists(req, res, next) {
+  const { orderId } = req.params;
+  const foundOrder = orders.find((order) => order.id === orderId);
+
+  if (foundOrder) {
+    res.locals.order = foundOrder;
+    return next();
+  }
+
+  next({
+    status: 404,
+    message: `Order ID not found: ${orderId}`,
+  });
+}
+
+function update(req, res, next) {
+  const { orderId } = req.params;
+  const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
+}
 
 function destroy(req, res, next) {}
 
