@@ -14,12 +14,22 @@ function read(req, res, next) {
   res.json({ data: res.locals.dish });
 }
 
-function update(req, res) {
+function update(req, res, next) {
   const { dishId } = req.params;
-  const { data: { name, description, price, image_url } = {} } = req.body;
+  const { data: { name, description, price, image_url, id } = {} } = req.body;
 
-  const updatedDish = { id: dishId, name, description, price, image_url };
-  res.json({ data: updatedDish });
+  const dish = dishes.find((dish) => dish.id === dishId);
+
+  if (dish) {
+    const updatedDish = { ...dish, name, description, price, image_url };
+    if (id) {
+      updatedDish.id = id;
+    }
+    Object.assign(dish, updatedDish);
+    res.json({ data: dish });
+  } else {
+    next({ status: 404, message: `Dish ${dishId} not found.` });
+  }
 }
 
 function list(req, res) {
@@ -63,24 +73,35 @@ const isUrlValid = validateField(
 
 function isPriceValid(req, res, next) {
   const { data: { price } = {} } = req.body;
-  if (!price || typeof price !== "number" || price <= 0) {
+  if (
+    !price ||
+    typeof price !== "number" ||
+    price <= 0 ||
+    !Number.isInteger(price)
+  ) {
     return next({
       status: 400,
-      message: "The price must be a number greater than 0.",
+      message: "Dish must have a price that is an integer greater than 0.",
     });
   }
   next();
 }
 
 function isIdValid(req, res, next) {
-  const { data: { id } = {}, params: { dishId } = {} } = req.body;
-  if (id && id !== dishId) {
-    return next({
-      status: 400,
-      message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`,
-    });
+  const { data: { id } = {} } = req.body;
+  const dishId = req.params.dishId;
+  if (id === undefined || id === null || id === "") {
+    return next();
   }
-  next();
+
+  if (id === dishId) {
+    return next();
+  }
+
+  next({
+    status: 400,
+    message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`,
+  });
 }
 
 module.exports = {
