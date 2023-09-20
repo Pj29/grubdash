@@ -2,6 +2,8 @@ const path = require("path");
 const dishes = require(path.resolve("src/data/dishes-data"));
 const nextId = require("../utils/nextId");
 
+// CRUDL functions //
+
 function create(req, res) {
   const { data: { name, description, price, image_url } = {} } = req.body;
   const newDish = { id: nextId(), name, description, price, image_url };
@@ -14,17 +16,15 @@ function read(req, res, next) {
   res.json({ data: res.locals.dish });
 }
 
+// Update handles PUT requests
 function update(req, res, next) {
   const { dishId } = req.params;
-  const { data: { name, description, price, image_url, id } = {} } = req.body;
+  const { data = {} } = req.body;
 
   const dish = dishes.find((dish) => dish.id === dishId);
 
   if (dish) {
-    const updatedDish = { ...dish, name, description, price, image_url };
-    if (id) {
-      updatedDish.id = id;
-    }
+    const updatedDish = { ...data, id: dishId };
     Object.assign(dish, updatedDish);
     res.json({ data: dish });
   } else {
@@ -35,6 +35,8 @@ function update(req, res, next) {
 function list(req, res) {
   res.json({ data: dishes });
 }
+
+// Validation Middleware //
 
 function dishExists(req, res, next) {
   const { dishId } = req.params;
