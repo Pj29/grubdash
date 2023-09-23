@@ -2,6 +2,8 @@ const path = require("path");
 const orders = require(path.resolve("src/data/orders-data"));
 const nextId = require("../utils/nextId");
 
+// CRUDL functions //
+
 function create(req, res) {
   const newOrder = { ...res.locals.order, id: nextId() };
   orders.push(newOrder);
@@ -41,6 +43,8 @@ function destroy(req, res, next) {
 function list(req, res) {
   res.json({ data: orders });
 }
+
+// Validation Middleware //
 
 function orderExists(req, res, next) {
   const { orderId } = req.params;

@@ -16,7 +16,6 @@ function read(req, res, next) {
   res.json({ data: res.locals.dish });
 }
 
-// Update handles PUT requests
 function update(req, res, next) {
   const { dishId } = req.params;
   const { data = {} } = req.body;
