@@ -2,7 +2,7 @@
 
 An API that provides order and dish data & follows RESTful design principles.
 
-### View when connected to frontend interface
+View when connected to frontend interface
 
 ---
 
